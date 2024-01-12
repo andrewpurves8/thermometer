@@ -9,7 +9,7 @@ const int tftI2cPower = 21;
 const int sensorPin = 8;
 const int ledPin = 13;
 
-const unsigned int tempStringSize = 20;
+const unsigned int temperatureStringSize = 20;
 
 const int samplePeriod = 5000;
 const int lowTempLedPeriod = 1000;
@@ -27,7 +27,7 @@ const char degreeSymbol = 248;
 
 int counter = 0;
 float temperature = 0.0f;
-char tempString[tempStringSize];
+char temperatureString[temperatureStringSize];
 int ledState = LOW;
 
 Adafruit_ST7789 tft = Adafruit_ST7789(tftCs, tftDc, tftRst);
@@ -50,7 +50,7 @@ void setup(void) {
   pinMode(ledPin, OUTPUT);
   
   // get first temperature reading
-  temperature = getTemperature();
+  updateTemperature();
 }
 
 void loop() {
@@ -66,14 +66,18 @@ void loop() {
   }
 
   if (counter == sampleCount) {
+    updateTemperature();
+    counter = 0;
+  }
+}
+
+void updateTemperature() {
     temperature = getTemperature();
-    sprintf(tempString, "Temperature: %.1f%cC", temperature, degreeSymbol);
-    drawText(tempString, ST77XX_WHITE);
+    sprintf(temperatureString, "Temperature: %.1f%cC", temperature, degreeSymbol);
+    drawText(temperatureString, ST77XX_WHITE);
     if (temperature >= lowTemp && temperature <= highTemp) {
       ledOff();
     }
-    counter = 0;
-  }
 }
 
 float getTemperature() {
